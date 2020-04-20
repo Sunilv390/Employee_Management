@@ -11,6 +11,6 @@ namespace BussinessLayer.Interface
         Employee AddEmployee(Employee employee);
         Employee UpdateEmployee(Employee employee);
         Employee GetEmployeeInfo(int id);
-        void DeleteEmployee(int id);
+        string DeleteEmployee(int id);
     }
 }

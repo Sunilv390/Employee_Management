@@ -25,7 +25,7 @@ namespace RepositoryLayer.Service
             {
                 using (SqlConnection con = new SqlConnection(this.connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("dpAddEmployee", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbAddEmployee", con);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@Id", employee.Id);
                     sqlCommand.Parameters.AddWithValue("@name", employee.Name);
@@ -57,7 +57,7 @@ namespace RepositoryLayer.Service
             {
                 using (SqlConnection sqlConnection = new SqlConnection(this.connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("spRemoveEmployee", sqlConnection);
+                    SqlCommand sqlCommand = new SqlCommand("dbRemoveEmployee", sqlConnection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@Id", id);
                     sqlConnection.Open();
@@ -82,7 +82,7 @@ namespace RepositoryLayer.Service
             {
                 using (SqlConnection con = new SqlConnection(this.connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("spShowAllEmployee", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbShowAllEmployee", con);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     con.Open();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
@@ -122,7 +122,7 @@ namespace RepositoryLayer.Service
             {
                 using (SqlConnection con = new SqlConnection(this.connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("spShowEmployeeById", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbShowEmployeeById", con);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@Id", id);
                     con.Open();
@@ -158,7 +158,7 @@ namespace RepositoryLayer.Service
             {
                 using (SqlConnection con = new SqlConnection(this.connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("spUpdateEmployee", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbUpdateEmployee", con);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@Id", employee.Id);
                     sqlCommand.Parameters.AddWithValue("@name", employee.Name);

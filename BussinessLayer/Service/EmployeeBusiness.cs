@@ -22,9 +22,10 @@ namespace BussinessLayer.Service
             return result;
         }
         [HttpDelete]
-        public void DeleteEmployee(int id)
+        public string DeleteEmployee(int id)
         {
             employeeRL.DeleteEmployee(id);
+            return "Deleted successfully";
         }
         [HttpGet]
         public List<Employee> GetAllEmployees()

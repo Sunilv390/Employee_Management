@@ -45,15 +45,17 @@ namespace EmployeeManagement.Controllers
             }
             [HttpDelete]
             [Route("{Id}")]
-            public void DeleteEmployee(int id)
+            public string DeleteEmployee(int id)
             {
                 employeeBL.DeleteEmployee(id);
+                return "Deleted Successfully";
             }
             [HttpPut]
             [Route("{Id}")]
-            public void UpdateEmployee(Employee employee)
+            public Employee UpdateEmployee(Employee employee)
             {
-                employeeBL.UpdateEmployee(employee);
+              var result=  employeeBL.UpdateEmployee(employee);
+                return result;
             }
         }
     }
