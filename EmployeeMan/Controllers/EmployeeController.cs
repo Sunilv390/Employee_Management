@@ -44,6 +44,7 @@ namespace EmployeeManagement.Controllers
                 return result;
             }
             [HttpDelete]
+            [Produces("application/json")]
             [Route("{Id}")]
             public string DeleteEmployee(int id)
             {
