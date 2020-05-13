@@ -4,59 +4,106 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EmployeeManagement.Controllers
 {
-    namespace EmployeeMangement.Controllers
+    [Route("api/[controller]")]
+    [Produces("application/json")]
+    [ApiController]
+    [EnableCors("MyPolicy")]
+    public class EmployeeController : ControllerBase
     {
-        [Route("api/[controller]")]
-        [ApiController]
-        public class EmployeeController : ControllerBase
+        private readonly IEmployeeBusiness employeeBL;
+        public EmployeeController(IEmployeeBusiness employeeBusiL)
         {
-            private readonly IEmployeeBusiness employeeBL;
-            public EmployeeController(IEmployeeBusiness employeeBusiL)
-            {
-                employeeBL = employeeBusiL;
-            }
-            [HttpGet]
-            [Route("")]
-            public List<Employee> GetAllEmployee()
+            employeeBL = employeeBusiL;
+        }
+
+        [HttpGet]
+        [EnableCors("MyPolicy")]
+        [Route("")]
+        public ActionResult GetAllEmployee()
+        {
+            try
             {
                 var result = employeeBL.GetAllEmployees();
-                return result;
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
             }
-            [HttpGet]
-            [Route("{Id}")]
-            public Employee GetEmployeeInformation(int id)
+            catch (Exception)
             {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [EnableCors("MyPolicy")]
+        [Route("{id}")]
+        public ActionResult GetEmployeeInformation(int id)
+        {
+            try
+            {
+                if (id != employeeBL.GetEmployeeInfo(id).Id)
+                {
+                    return NotFound();
+                }
                 var result = employeeBL.GetEmployeeInfo(id);
-                return result;
+                return Ok(result);
             }
-
-            [HttpPost]
-            [Route("")]
-            public Employee AddEmployee(Employee employee)
+            catch (Exception)
             {
-
-                var result = employeeBL.AddEmployee(employee);
-                return result;
+                return BadRequest(id);
             }
-            [HttpDelete]
-            [Produces("application/json")]
-            [Route("{Id}")]
-            public string DeleteEmployee(int id)
+        }
+
+        [HttpPost]
+        [EnableCors("MyPolicy")]
+        [Route("")]
+        public ActionResult AddEmployee(Employee employee)
+        {
+            try
+            {
+                var result = employeeBL.AddEmployee(employee);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete]
+        [EnableCors("MyPolicy")]
+        [Route("{id}")]
+        public ActionResult DeleteEmployee(int id)
+        {
+            try
             {
                 employeeBL.DeleteEmployee(id);
-                return "Deleted Successfully";
+                return Ok("Deleted successfully");
             }
-            [HttpPut]
-            [Route("{Id}")]
-            public Employee UpdateEmployee(Employee employee)
+            catch (Exception)
             {
-              var result=  employeeBL.UpdateEmployee(employee);
-                return result;
+                return NotFound();
+            }
+        }
+
+        [HttpPut]
+        [EnableCors("MyPolicy")]
+        [Route("{id}")]
+        public ActionResult UpdateEmployee(Employee employee)
+        {
+            try
+            {
+                var result = employeeBL.UpdateEmployee(employee);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return NotFound();
             }
         }
     }

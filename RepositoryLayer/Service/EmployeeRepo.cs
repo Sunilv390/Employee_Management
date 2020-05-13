@@ -27,7 +27,6 @@ namespace RepositoryLayer.Service
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbAddEmployee", con);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    sqlCommand.Parameters.AddWithValue("@Id", employee.Id);
                     sqlCommand.Parameters.AddWithValue("@name", employee.Name);
                     sqlCommand.Parameters.AddWithValue("@email", employee.Email);
                     sqlCommand.Parameters.AddWithValue("@salary", employee.Salary);
@@ -40,9 +39,9 @@ namespace RepositoryLayer.Service
                     con.Close();
                 }
             }
-            catch (Exception e)
+            catch 
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
             return employee;
         }
@@ -59,20 +58,20 @@ namespace RepositoryLayer.Service
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbRemoveEmployee", sqlConnection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    sqlCommand.Parameters.AddWithValue("@Id", id);
+                    sqlCommand.Parameters.AddWithValue("@id", id);
                     sqlConnection.Open();
                     sqlCommand.ExecuteNonQuery();
                     sqlConnection.Close();
                 }
             }
-            catch (Exception e)
+            catch 
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
         /// <summary>
-        /// Gets all employees.
+        /// Gets all records of an Employee
         /// </summary>
         /// <returns>returns the list of all employee</returns>
         public List<Employee> GetAllEmployees()
@@ -89,7 +88,7 @@ namespace RepositoryLayer.Service
                     while (dataReader.Read())
                     {
                         Employee employee = new Employee();
-                        employee.Id = Convert.ToInt32(dataReader["Id"]);
+                        employee.Id = Convert.ToInt32(dataReader["id"]);
                         employee.Name = dataReader["name"].ToString();
                         employee.Email = dataReader["email"].ToString();
                         employee.Salary = Convert.ToDouble(dataReader["salary"]);
@@ -103,15 +102,15 @@ namespace RepositoryLayer.Service
                     con.Close();
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
             return employees;
         }
 
         /// <summary>
-        /// Gets the employee data.
+        /// Gets the employee data by specific Id
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>gets data of single employee</returns>
@@ -124,12 +123,12 @@ namespace RepositoryLayer.Service
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbShowEmployeeById", con);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    sqlCommand.Parameters.AddWithValue("@Id", id);
+                    sqlCommand.Parameters.AddWithValue("@id", id);
                     con.Open();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
                     {
-                        employee.Id = Convert.ToInt32(dataReader["Id"]);
+                        employee.Id = Convert.ToInt32(dataReader["id"]);
                         employee.Name = dataReader["name"].ToString();
                         employee.Email = dataReader["email"].ToString();
                         employee.Salary = Convert.ToDouble(dataReader["salary"]);
@@ -140,15 +139,15 @@ namespace RepositoryLayer.Service
                     }
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
             return employee;
         }
 
         /// <summary>
-        /// Updates the employee.
+        /// Updates the employee details.
         /// </summary>
         /// <param name="employee">The employee.</param>
         /// <returns>returns the updated employee</returns>
@@ -160,7 +159,7 @@ namespace RepositoryLayer.Service
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbUpdateEmployee", con);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    sqlCommand.Parameters.AddWithValue("@Id", employee.Id);
+                    sqlCommand.Parameters.AddWithValue("@id", employee.Id);
                     sqlCommand.Parameters.AddWithValue("@name", employee.Name);
                     sqlCommand.Parameters.AddWithValue("@email", employee.Email);
                     sqlCommand.Parameters.AddWithValue("@salary", employee.Salary);
@@ -173,9 +172,9 @@ namespace RepositoryLayer.Service
                     con.Close();
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Console.WriteLine(e.Message);
+                throw;
             }
             return employee;
         }
