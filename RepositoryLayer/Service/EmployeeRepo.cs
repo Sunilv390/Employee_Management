@@ -1,4 +1,5 @@
 ﻿using CommonLayer.Model;
+using Microsoft.Extensions.Configuration;
 using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
@@ -12,20 +13,27 @@ namespace RepositoryLayer.Service
         /// <summary>
         /// The connection string
         /// </summary>
-        string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ASUS\Documents\EmpDb.mdf;Integrated Security=True;Connect Timeout=30";
+        // readonly string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ASUS\Documents\EmpDb.mdf;Integrated Security=True;Connect Timeout=30";
 
         /// <summary>
         /// Adds the employee.
         /// </summary>
         /// <param name="employee">The employee.</param>
         /// <returns>returns the employee added</returns> 
+        private readonly IConfiguration config;
+        public EmployeeRepo(IConfiguration _config)
+        {
+            config = _config;
+        }
+
         public Employee AddEmployee(Employee employee)
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(this.connectionString))
+                string con = config.GetConnectionString("EmpDb");
+                using (SqlConnection connection = new SqlConnection(con))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("dbAddEmployee", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbAddEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@name", employee.Name);
                     sqlCommand.Parameters.AddWithValue("@email", employee.Email);
@@ -34,14 +42,14 @@ namespace RepositoryLayer.Service
                     sqlCommand.Parameters.AddWithValue("@experience", employee.Experience);
                     sqlCommand.Parameters.AddWithValue("@department", employee.Department);
                     sqlCommand.Parameters.AddWithValue("@contact", employee.ContactNumber);
-                    con.Open();
+                    connection.Open();
                     sqlCommand.ExecuteNonQuery();
-                    con.Close();
+                    connection.Close();
                 }
             }
-            catch 
+            catch (Exception)
             {
-                throw;
+                throw new Exception();
             }
             return employee;
         }
@@ -54,19 +62,20 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                using (SqlConnection sqlConnection = new SqlConnection(this.connectionString))
+                string con = config.GetConnectionString("EmpDb");
+                using (SqlConnection connection = new SqlConnection(con))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("dbRemoveEmployee", sqlConnection);
+                    SqlCommand sqlCommand = new SqlCommand("dbRemoveEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@id", id);
-                    sqlConnection.Open();
+                    connection.Open();
                     sqlCommand.ExecuteNonQuery();
-                    sqlConnection.Close();
+                    connection.Close();
                 }
             }
-            catch 
+            catch (Exception)
             {
-                throw;
+                throw new Exception();
             }
         }
 
@@ -79,11 +88,12 @@ namespace RepositoryLayer.Service
             List<Employee> employees = new List<Employee>();
             try
             {
-                using (SqlConnection con = new SqlConnection(this.connectionString))
+                string con = config.GetConnectionString("EmpDb");
+                using (SqlConnection connection = new SqlConnection(con))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("dbShowAllEmployee", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbShowAllEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    con.Open();
+                    connection.Open();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
                     {
@@ -99,12 +109,12 @@ namespace RepositoryLayer.Service
 
                         employees.Add(employee);
                     }
-                    con.Close();
+                    connection.Close();
                 }
             }
-            catch
+            catch (Exception)
             {
-                throw;
+                throw new Exception();
             }
             return employees;
         }
@@ -119,12 +129,13 @@ namespace RepositoryLayer.Service
             Employee employee = new Employee();
             try
             {
-                using (SqlConnection con = new SqlConnection(this.connectionString))
+                string con = config.GetConnectionString("EmpDb");
+                using (SqlConnection connection = new SqlConnection(con))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("dbShowEmployeeById", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbShowEmployeeById", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@id", id);
-                    con.Open();
+                    connection.Open();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
                     {
@@ -139,9 +150,9 @@ namespace RepositoryLayer.Service
                     }
                 }
             }
-            catch
+            catch (Exception)
             {
-                throw;
+                throw new Exception();
             }
             return employee;
         }
@@ -155,9 +166,10 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(this.connectionString))
+                string con = config.GetConnectionString("EmpDb");
+                using (SqlConnection connection = new SqlConnection(con))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("dbUpdateEmployee", con);
+                    SqlCommand sqlCommand = new SqlCommand("dbUpdateEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@id", employee.Id);
                     sqlCommand.Parameters.AddWithValue("@name", employee.Name);
@@ -167,14 +179,14 @@ namespace RepositoryLayer.Service
                     sqlCommand.Parameters.AddWithValue("@experience", employee.Experience);
                     sqlCommand.Parameters.AddWithValue("@department", employee.Department);
                     sqlCommand.Parameters.AddWithValue("@contact", employee.ContactNumber);
-                    con.Open();
+                    connection.Open();
                     sqlCommand.ExecuteNonQuery();
-                    con.Close();
+                    connection.Close();
                 }
             }
-            catch
+            catch (Exception)
             {
-                throw;
+                throw new Exception();
             }
             return employee;
         }

@@ -5,20 +5,15 @@ using System.Text;
 
 namespace CommonLayer.Model
 {
-    public class EmployeeRegistration
+    public class Login
     {
-        public int Id { get; set; }
-
         [Required]
-        [RegularExpression(@"^[A-Z][a-zA-Z]*$")]
-        public string Name { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
+        [StringLength(50, MinimumLength = 6)]
         public string Password { get; set; }
-
-        [Required]
-        public string EmailAddress { get; set; }
-
     }
 }

@@ -1,12 +1,11 @@
 ﻿using CommonLayer.Model;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BussinessLayer.Interface
+namespace RepositoryLayer.Interface
 {
-    public interface IUserDetail
+    public interface IUserService
     {
         Register AddUserDetail(Register user);
         List<Register> GetUser();
