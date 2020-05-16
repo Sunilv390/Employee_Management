@@ -26,6 +26,5 @@ namespace CommonLayer.Model
         [Required]
         [Phone]
         public string Contact { get; set; }
-        public System.DateTime Date { get; set; }
     }
 }

@@ -9,6 +9,6 @@ namespace RepositoryLayer.Interface
     {
         Register AddUserDetail(Register user);
         List<Register> GetUser();
-        Register Login(Login login);
+        User Login(Login login);
     }
 }

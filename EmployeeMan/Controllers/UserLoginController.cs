@@ -19,45 +19,78 @@ namespace EmployeeManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LoginController : ControllerBase
+    public class UserLoginController : ControllerBase
     {
         private readonly IUserDetail userDetail;
         private readonly IConfiguration _config;
-        public LoginController(IUserDetail _userDetail,IConfiguration config)
+        public UserLoginController(IUserDetail _userDetail,IConfiguration config)
         {
             userDetail = _userDetail;
             _config = config;
         }
 
+        //POST api/Register
+        //Regsiter the new User Data
+        [HttpPost]
+        [Route("Register")]
+        public ActionResult Register(Register user)
+        {
+            try
+            {
+                var data = userDetail.AddUserDetail(user);
+                if (data == null)
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        StatusCodeResult = "success",
+                        Message = "Added Successfully",
+                        data
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                throw new Exception();
+            }
+        }
+
         //POST api/Login
         [HttpPost]
-        [Route("Login")]
+        [Route("login")]
         public ActionResult Login(Login login)
         {
             try
             {
-                Register data = userDetail.Login(login);
+                var data = userDetail.Login(login);
+                bool success = false;
+                string message, jsonToken;
+
                 if (data == null)
                 {
-                    return NotFound();
+                    message = "Enter Valid Email & Password";
+                    return Ok(new { success, message });
                 }
-                return Ok(new
+                else
                 {
-                    StatusCodeResult = "Success",
-                    Message = "Login Successfully",
-                    data
-                });
-            }
-            catch (Exception e)
+                    success = true;
+                    message = " Login Successfully";
+                    jsonToken = GetToken(data, "login");
+                    return Ok(new { success, message, data, jsonToken });
+                }
+        }
+            catch (Exception ex)
             {
-                return BadRequest(new { e.Message });
+                return BadRequest(new { ex.Message });
             }
         }
 
         //GET api
         //returns the data in SMD format
         [HttpGet]
-        [Route("")]
         public ActionResult GetUser()
         {
             try
@@ -80,8 +113,7 @@ namespace EmployeeManagement.Controllers
             }
         }
 
-        //Generate JWT Token for Authentication
-        public string  GetToken(Register data,string type)
+        public string GetToken(User data, string type)
         {
             try
             {
@@ -92,7 +124,7 @@ namespace EmployeeManagement.Controllers
                 var claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.Role, type));
                 claims.Add(new Claim("Email", data.Email.ToString()));
-                claims.Add(new Claim("Password", data.Password.ToString()));
+              //  claims.Add(new Claim("Password", data.Password.ToString()));
 
                 var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                     _config["Jwt:Issuer"],

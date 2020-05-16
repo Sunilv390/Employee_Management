@@ -13,13 +13,13 @@ namespace RepositoryLayer.Service
         /// <summary>
         /// The connection string
         /// </summary>
-        // readonly string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ASUS\Documents\EmpDb.mdf;Integrated Security=True;Connect Timeout=30";
-
+         readonly string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ASUS\Documents\EmpDb.mdf;Integrated Security=True;Connect Timeout=30";
         /// <summary>
         /// Adds the employee.
         /// </summary>
         /// <param name="employee">The employee.</param>
         /// <returns>returns the employee added</returns> 
+       
         private readonly IConfiguration config;
         public EmployeeRepo(IConfiguration _config)
         {
@@ -30,8 +30,7 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(this.connectionString))
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbAddEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -62,8 +61,7 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(this.connectionString))
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbRemoveEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -88,8 +86,7 @@ namespace RepositoryLayer.Service
             List<Employee> employees = new List<Employee>();
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(this.connectionString))
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbShowAllEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -129,8 +126,7 @@ namespace RepositoryLayer.Service
             Employee employee = new Employee();
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(this.connectionString))
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbShowEmployeeById", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -166,8 +162,7 @@ namespace RepositoryLayer.Service
         {
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(this.connectionString))
                 {
                     SqlCommand sqlCommand = new SqlCommand("dbUpdateEmployee", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;

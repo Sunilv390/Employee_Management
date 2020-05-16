@@ -10,34 +10,25 @@ namespace RepositoryLayer.Service
 {
     public class RepoUserDetail : IUserService
     {
-        private readonly IConfiguration config;
-        public RepoUserDetail(IConfiguration _config)
-        {
-            config = _config;
-        }
-
+        readonly string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ASUS\Documents\EmpDb.mdf;Integrated Security=True;Connect Timeout=30";
         public Register AddUserDetail(Register user)
         {
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     SqlCommand sqlCommand = new SqlCommand("spAddUserDetail", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-
                     sqlCommand.Parameters.AddWithValue("@Name", user.Name);
                     sqlCommand.Parameters.AddWithValue("@Email", user.Email);
                     sqlCommand.Parameters.AddWithValue("@Password", user.Password);
                     sqlCommand.Parameters.AddWithValue("@Contact", user.Contact);
-                    sqlCommand.Parameters.AddWithValue("@Date", user.Date);
                     connection.Open();
                     sqlCommand.ExecuteNonQuery();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
                     {
                         user.Id = Convert.ToInt32(dataReader["Id"].ToString());
-                        user.Date = Convert.ToDateTime(dataReader["Date"].ToString());
                     }
                     connection.Close();
                     return user;
@@ -49,15 +40,14 @@ namespace RepositoryLayer.Service
             }
         }
 
-        public Register Login(Login user)
+        public User Login(Login user)
         {
-            Register register = new Register();
+            User register = new User();
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("spLogin", connection);
+                    SqlCommand sqlCommand = new SqlCommand("dpLogin", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@Email", user.Email);
                     sqlCommand.Parameters.AddWithValue("@Password", user.Password);
@@ -65,32 +55,29 @@ namespace RepositoryLayer.Service
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
                     {
-                        register.Id = Convert.ToInt32(dataReader["@Id"].ToString()) ;
-                        register.Password = dataReader["Password"].ToString();
+                        register.Id = Convert.ToInt32(dataReader["Id"].ToString());
                         register.Name = dataReader["Name"].ToString();
                         register.Email = dataReader["Email"].ToString();
+                       // register.Password = dataReader["Password"].ToString();
                         register.Contact = dataReader["Contact"].ToString();
-                        register.Date = Convert.ToDateTime(dataReader["Date"].ToString());
                     }
                 }
+                // Return User Data
+                return register;
             } // Exception
-            catch (Exception)
+            catch (Exception e)
             {
-
-                throw new Exception();
+                throw e;
             }
-            // Return User Data
-            return register;
+           
         }
-
 
         public List<Register> GetUser()
         {
             List<Register> users = new List<Register>();
             try
             {
-                string con = config.GetConnectionString("EmpDb");
-                using (SqlConnection connection = new SqlConnection(con))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     SqlCommand sqlCommand = new SqlCommand("spGetUsersDetail", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
@@ -104,7 +91,6 @@ namespace RepositoryLayer.Service
                         user.Email = dataReader["Email"].ToString();
                         user.Password = dataReader["Password"].ToString();
                         user.Contact = dataReader["Contact"].ToString();
-                        user.Date = Convert.ToDateTime(dataReader["Date"].ToString());
 
                         users.Add(user);
                     }   

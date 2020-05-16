@@ -27,34 +27,19 @@ namespace EmployeeManagement
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-          //  var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Jwt:Key"));
-            services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
-            {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader()
-                       .AllowCredentials()
-                       .Build();
-            }));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddTransient<IEmployeeBusiness, EmployeeBusiness>();
-            services.AddTransient<IEmployeeRepo, EmployeeRepo>();
-            services.AddTransient<IUserDetail, UserDetail>();
-            services.AddTransient<IUserService, RepoUserDetail>();
-
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1",
-                    new OpenApiInfo
+                    new Microsoft.OpenApi.Models.OpenApiInfo
                     {
-                        Title = "Employee Management API",
-                        Description = "Employee Management API",
+                        Title = "Employee Management",
+                        Description = "Employee Management",
                         Version = "v1"
                     });
             });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(option => 
+                .AddJwtBearer(option =>
                 {
                     var serverSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:key"]));
                     option.TokenValidationParameters = new TokenValidationParameters
@@ -64,7 +49,24 @@ namespace EmployeeManagement
                         ValidAudience = Configuration["JWT:Audience"]
                     };
                 });
+
+            services.AddCors();
+            services.AddMvc();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddTransient<IEmployeeBusiness, EmployeeBusiness>();
+            services.AddTransient<IEmployeeRepo, EmployeeRepo>();
+            services.AddTransient<IUserDetail, UserDetail>();
+            services.AddTransient<IUserService, RepoUserDetail>();
+            services.AddCors(options => options.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader()
+                       .AllowCredentials()
+                       .Build();
+            }));
         }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -85,7 +87,7 @@ namespace EmployeeManagement
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management API");
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management");
                 options.RoutePrefix = "";
             });
 

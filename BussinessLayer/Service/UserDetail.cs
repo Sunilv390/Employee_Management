@@ -32,7 +32,7 @@ namespace BussinessLayer.Service
             }
         }
 
-        public Register Login(Login login)
+        public User Login(Login login)
         {
             try
             {
@@ -43,9 +43,9 @@ namespace BussinessLayer.Service
                 }
                 return result;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception();
+                throw e;
             }
         }
 
