@@ -25,6 +25,7 @@ namespace CommonLayer.Model
 
         [Required]
         [Phone]
+        [RegularExpression(@"^[7-9]{1}[0-9]{9}$")]
         public string Contact { get; set; }
     }
 }

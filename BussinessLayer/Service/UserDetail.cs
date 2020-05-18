@@ -26,9 +26,9 @@ namespace BussinessLayer.Service
                 }
                 return result;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception();
+                throw e;
             }
         }
 
@@ -49,16 +49,16 @@ namespace BussinessLayer.Service
             }
         }
 
-        public List<Register> GetUser()
+        public List<Register> GetData()
         {
             try
             {
-                var result = repositoryUser.GetUser();
+                var result = repositoryUser.GetData();
                 return result;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception();
+                throw e;
             }
         }
     }

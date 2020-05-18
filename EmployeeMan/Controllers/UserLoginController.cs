@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -12,6 +13,8 @@ using CommonLayer.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Expressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -34,27 +37,27 @@ namespace EmployeeManagement.Controllers
         [HttpPost]
         [Route("Register")]
         public ActionResult Register(Register user)
-        {
+        { 
             try
             {
                 var data = userDetail.AddUserDetail(user);
-                if (data == null)
+                bool success = false;
+                string message;
+                if (data==null)
                 {
-                    return BadRequest();
+                    message = "Email or Contact exists";
+                    return Ok(new { success, message });
                 }
                 else
                 {
-                    return Ok(new
-                    {
-                        StatusCodeResult = "success",
-                        Message = "Added Successfully",
-                        data
-                    });
+                    success = true;
+                    message = "Registered Successfully";
+                    return Ok(new { success, message, data });
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception();
+                return BadRequest(new { e.Message });
             }
         }
 
@@ -65,9 +68,9 @@ namespace EmployeeManagement.Controllers
         {
             try
             {
-                var data = userDetail.Login(login);
+                User data = userDetail.Login(login);
                 bool success = false;
-                string message, jsonToken;
+                string message;
 
                 if (data == null)
                 {
@@ -78,7 +81,7 @@ namespace EmployeeManagement.Controllers
                 {
                     success = true;
                     message = " Login Successfully";
-                    jsonToken = GetToken(data, "login");
+                    var jsonToken = GetToken(data, "login");
                     return Ok(new { success, message, data, jsonToken });
                 }
         }
@@ -88,31 +91,7 @@ namespace EmployeeManagement.Controllers
             }
         }
 
-        //GET api
-        //returns the data in SMD format
-        [HttpGet]
-        public ActionResult GetUser()
-        {
-            try
-            {
-                var data = userDetail.GetUser();
-                if (data == null)
-                {
-                    return NotFound();
-                }
-                return Ok(new
-                {
-                    StatusCodeResult = "success",
-                    Message = "User Data",
-                    data
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-
+        //Generates Token for Login
         public string GetToken(User data, string type)
         {
             try
@@ -123,20 +102,35 @@ namespace EmployeeManagement.Controllers
 
                 var claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.Role, type));
+                claims.Add(new Claim("Id", data.Id.ToString()));
                 claims.Add(new Claim("Email", data.Email.ToString()));
-              //  claims.Add(new Claim("Password", data.Password.ToString()));
 
                 var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                     _config["Jwt:Issuer"],
                     claims,
-                    expires: DateTime.Now.AddHours(1),
+                    expires: DateTime.Now.AddMinutes(5),
                     signingCredentials: signingCredentials
                     );
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                return e.Message;
+            }
+        }
+
+        [Authorize]
+        [HttpGet]
+        public ActionResult GetData()
+        {
+            try
+            {
+                List<Register> register = userDetail.GetData();
+                return Ok(register.ToList());
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
             }
         }
     }

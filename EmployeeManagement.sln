@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonLayer", "CommonLayer\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepositoryLayer", "RepositoryLayer\RepositoryLayer.csproj", "{429207B1-8C7A-4DA1-810F-3BC2EF0E9C95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTestEmployeePortal", "XUnitTestEmployeePortal\XUnitTestEmployeePortal.csproj", "{4CC5E495-409F-444E-B81C-44AA1244AE89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{429207B1-8C7A-4DA1-810F-3BC2EF0E9C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{429207B1-8C7A-4DA1-810F-3BC2EF0E9C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{429207B1-8C7A-4DA1-810F-3BC2EF0E9C95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CC5E495-409F-444E-B81C-44AA1244AE89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CC5E495-409F-444E-B81C-44AA1244AE89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CC5E495-409F-444E-B81C-44AA1244AE89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CC5E495-409F-444E-B81C-44AA1244AE89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

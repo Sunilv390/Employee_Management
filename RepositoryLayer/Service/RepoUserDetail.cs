@@ -1,9 +1,11 @@
 ﻿using CommonLayer.Model;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Security.Cryptography.Xml;
 using System.Text;
 
 namespace RepositoryLayer.Service
@@ -17,26 +19,27 @@ namespace RepositoryLayer.Service
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("spAddUserDetail", connection);
+                    SqlCommand sqlCommand = new SqlCommand("dbAddUsersDetail", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@Name", user.Name);
                     sqlCommand.Parameters.AddWithValue("@Email", user.Email);
-                    sqlCommand.Parameters.AddWithValue("@Password", user.Password);
+                    sqlCommand.Parameters.AddWithValue("@Password", Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Password)));
                     sqlCommand.Parameters.AddWithValue("@Contact", user.Contact);
                     connection.Open();
-                    sqlCommand.ExecuteNonQuery();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
                     {
                         user.Id = Convert.ToInt32(dataReader["Id"].ToString());
+                        user.Email = dataReader["Email"].ToString();
+                        user.Password= dataReader["Password"].ToString();
                     }
                     connection.Close();
                     return user;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception();
+                throw e;
             }
         }
 
@@ -47,10 +50,10 @@ namespace RepositoryLayer.Service
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    SqlCommand sqlCommand = new SqlCommand("dpLogin", connection);
+                    SqlCommand sqlCommand = new SqlCommand("spLogin", connection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlCommand.Parameters.AddWithValue("@Email", user.Email);
-                    sqlCommand.Parameters.AddWithValue("@Password", user.Password);
+                    sqlCommand.Parameters.AddWithValue("@Password", Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Password)));
                     connection.Open();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
@@ -58,7 +61,6 @@ namespace RepositoryLayer.Service
                         register.Id = Convert.ToInt32(dataReader["Id"].ToString());
                         register.Name = dataReader["Name"].ToString();
                         register.Email = dataReader["Email"].ToString();
-                       // register.Password = dataReader["Password"].ToString();
                         register.Contact = dataReader["Contact"].ToString();
                     }
                 }
@@ -69,10 +71,9 @@ namespace RepositoryLayer.Service
             {
                 throw e;
             }
-           
         }
 
-        public List<Register> GetUser()
+        public List<Register> GetData()
         {
             List<Register> users = new List<Register>();
             try
@@ -93,7 +94,7 @@ namespace RepositoryLayer.Service
                         user.Contact = dataReader["Contact"].ToString();
 
                         users.Add(user);
-                    }   
+                    }
                     connection.Close();
                 }
             }

@@ -27,15 +27,24 @@ namespace EmployeeManagement
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerGen(options =>
+            services.AddSwaggerGen(c =>
             {
-                options.SwaggerDoc("v1",
-                    new Microsoft.OpenApi.Models.OpenApiInfo
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo
                     {
+                        Version = "v1",
                         Title = "Employee Management",
-                        Description = "Employee Management",
-                        Version = "v1"
+                       
                     });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme."
+                });
             });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -49,6 +58,7 @@ namespace EmployeeManagement
                         ValidAudience = Configuration["JWT:Audience"]
                     };
                 });
+
 
             services.AddCors();
             services.AddMvc();
@@ -78,19 +88,19 @@ namespace EmployeeManagement
             {
                 app.UseHsts();
             }
-            app.UseCors("MyPolicy");
-            app.UseAuthentication();
-            app.UseHttpsRedirection();
-            app.UseMvc();
-            
+
             //Enable middleware to serve generated Swagger as a JSON endpoint
             app.UseSwagger();
-            app.UseSwaggerUI(options =>
+            app.UseSwaggerUI(c =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management");
-                options.RoutePrefix = "";
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management API v1");
+                c.RoutePrefix = "";
             });
 
+            app.UseAuthentication();
+            app.UseCors("MyPolicy");
+            app.UseHttpsRedirection();
+            app.UseMvc();
         }
     }
 }

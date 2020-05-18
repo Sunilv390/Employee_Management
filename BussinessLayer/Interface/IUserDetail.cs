@@ -9,7 +9,7 @@ namespace BussinessLayer.Interface
     public interface IUserDetail
     {
         Register AddUserDetail(Register user);
-        List<Register> GetUser();
+        List<Register> GetData();
         User Login(Login login);
     }
 }
