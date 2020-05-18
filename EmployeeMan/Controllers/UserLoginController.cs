@@ -119,14 +119,15 @@ namespace EmployeeManagement.Controllers
             }
         }
 
+        //GET api/GetAllData
         [Authorize]
         [HttpGet]
         public ActionResult GetData()
         {
             try
             {
-                List<Register> register = userDetail.GetData();
-                return Ok(register.ToList());
+                var register = userDetail.GetData();
+                return Ok(register);
             }
             catch (Exception e)
             {

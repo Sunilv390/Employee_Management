@@ -20,6 +20,7 @@ namespace EmployeeManagement.Controllers
             employeeBL = employeeBusiL;
         }
 
+        //GET api/AllEmployee
         [HttpGet]
         [EnableCors("MyPolicy")]
         [Route("")]
@@ -40,6 +41,7 @@ namespace EmployeeManagement.Controllers
             }
         }
 
+        //GET api/Employee_By_Id
         [HttpGet]
         [EnableCors("MyPolicy")]
         [Route("{id}")]
@@ -60,6 +62,7 @@ namespace EmployeeManagement.Controllers
             }
         }
 
+        //POST api/Employee Detail
         [HttpPost]
         [EnableCors("MyPolicy")]
         [Route("")]
@@ -76,6 +79,7 @@ namespace EmployeeManagement.Controllers
             }
         }
 
+        //DELETE api/Delete_Employee_by_ID
         [HttpDelete]
         [EnableCors("MyPolicy")]
         [Route("{id}")]
@@ -92,6 +96,7 @@ namespace EmployeeManagement.Controllers
             }
         }
 
+        //PUT api/UpdateEmployee Data
         [HttpPut]
         [EnableCors("MyPolicy")]
         [Route("{id}")]
