@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using BussinessLayer.Interface;
-using BussinessLayer.Service;
+﻿using BussinessLayer.Interface;
 using CommonLayer.Model;
+using Experimental.System.Messaging;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Expressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace EmployeeManagement.Controllers
 {
@@ -26,6 +19,8 @@ namespace EmployeeManagement.Controllers
     {
         private readonly IUserDetail userDetail;
         private readonly IConfiguration _config;
+
+        MessageSender sender = new MessageSender();
         public UserLoginController(IUserDetail _userDetail,IConfiguration config)
         {
             userDetail = _userDetail;
@@ -52,6 +47,8 @@ namespace EmployeeManagement.Controllers
                 {
                     success = true;
                     message = "Registered Successfully";
+                    string messageSender = ("Registration successful" + "\n Email : " + Convert.ToString(user.Email) + "\n Password : " + (data.Password)) ;
+                    sender.Message(messageSender);
                     return Ok(new { success, message, data });
                 }
             }
@@ -91,6 +88,23 @@ namespace EmployeeManagement.Controllers
             }
         }
 
+        //GET api/GetAllData
+        [Authorize]
+        [HttpGet]
+        public ActionResult GetData()
+        {
+            try
+            {
+                var register = userDetail.GetData();
+
+                return Ok(register);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { e.Message });
+            }
+        }
+
         //Generates Token for Login
         public string GetToken(User data, string type)
         {
@@ -115,23 +129,7 @@ namespace EmployeeManagement.Controllers
             }
             catch (Exception e)
             {
-                return e.Message;
-            }
-        }
-
-        //GET api/GetAllData
-        [Authorize]
-        [HttpGet]
-        public ActionResult GetData()
-        {
-            try
-            {
-                var register = userDetail.GetData();
-                return Ok(register);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new { e.Message });
+                throw new Exception (e.Message);
             }
         }
     }

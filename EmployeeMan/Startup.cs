@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NETCore.MailKit.Core;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Service;
 using System.Text;
@@ -27,15 +27,30 @@ namespace EmployeeManagement
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+            services.AddMvc();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddTransient<IEmployeeBusiness, EmployeeBusiness>();
+            services.AddTransient<IEmployeeRepo, EmployeeRepo>();
+            services.AddTransient<IUserDetail, UserDetail>();
+            services.AddTransient<IUserService, RepoUserDetail>();
+            services.AddCors(options => options.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
-                    new OpenApiInfo
-                    {
-                        Version = "v1",
-                        Title = "Employee Management",
-                       
+                    new OpenApiInfo 
+                    { 
+                        Title = "Employee Management", 
+                        Description = "Swagger Api" ,
+                        Version="v1"
                     });
+
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -58,23 +73,6 @@ namespace EmployeeManagement
                         ValidAudience = Configuration["JWT:Audience"]
                     };
                 });
-
-
-            services.AddCors();
-            services.AddMvc();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddTransient<IEmployeeBusiness, EmployeeBusiness>();
-            services.AddTransient<IEmployeeRepo, EmployeeRepo>();
-            services.AddTransient<IUserDetail, UserDetail>();
-            services.AddTransient<IUserService, RepoUserDetail>();
-            services.AddCors(options => options.AddPolicy("MyPolicy", builder =>
-            {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader()
-                       .AllowCredentials()
-                       .Build();
-            }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,12 +89,11 @@ namespace EmployeeManagement
 
             //Enable middleware to serve generated Swagger as a JSON endpoint
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            app.UseSwaggerUI(options =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management API v1");
-                c.RoutePrefix = "";
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Managemnt");
+                options.RoutePrefix = "";
             });
-
             app.UseAuthentication();
             app.UseCors("MyPolicy");
             app.UseHttpsRedirection();
