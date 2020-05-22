@@ -7,7 +7,7 @@ namespace RepositoryLayer.Interface
 {
     public interface IUserService
     {
-        Register AddUserDetail(Register user);
+        User AddUserDetail(Register user);
         List<Register> GetData();
         User Login(Login login);
     }

@@ -13,8 +13,10 @@ namespace RepositoryLayer.Service
     public class RepoUserDetail : IUserService
     {
         readonly string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ASUS\Documents\EmpDb.mdf;Integrated Security=True;Connect Timeout=30";
-        public Register AddUserDetail(Register user)
+        public User AddUserDetail(Register user)
+
         {
+            User userdetails = new User();
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
@@ -29,12 +31,13 @@ namespace RepositoryLayer.Service
                     SqlDataReader dataReader = sqlCommand.ExecuteReader();
                     while (dataReader.Read())
                     {
-                        user.Id = Convert.ToInt32(dataReader["Id"].ToString());
-                        user.Email = dataReader["Email"].ToString();
-                        user.Password= dataReader["Password"].ToString();
+                        userdetails.Id = Convert.ToInt32(dataReader["Id"].ToString());
+                        userdetails.Name = dataReader["Name"].ToString();
+                        userdetails.Email = dataReader["Email"].ToString();
+                        userdetails.Contact = dataReader["Contact"].ToString();
                     }
                     connection.Close();
-                    return user;
+                    return userdetails;
                 }
             }
             catch (Exception e)

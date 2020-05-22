@@ -15,7 +15,7 @@ namespace BussinessLayer.Service
             repositoryUser = _repositoryUser;
         }
 
-        public Register AddUserDetail(Register user)
+        public User AddUserDetail(Register user)
         {
             try
             {

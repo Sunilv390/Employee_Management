@@ -1,13 +1,14 @@
 ﻿using BussinessLayer.Interface;
 using CommonLayer.Model;
-using Experimental.System.Messaging;
-using Microsoft.AspNetCore.Authorization;
+using EmployeeManagement.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 
@@ -19,8 +20,10 @@ namespace EmployeeManagement.Controllers
     {
         private readonly IUserDetail userDetail;
         private readonly IConfiguration _config;
+        
 
         MessageSender sender = new MessageSender();
+        SMTPService sMTP = new SMTPService();
         public UserLoginController(IUserDetail _userDetail,IConfiguration config)
         {
             userDetail = _userDetail;
@@ -38,6 +41,7 @@ namespace EmployeeManagement.Controllers
                 var data = userDetail.AddUserDetail(user);
                 bool success = false;
                 string message;
+
                 if (data==null)
                 {
                     message = "Email or Contact exists";
@@ -47,8 +51,10 @@ namespace EmployeeManagement.Controllers
                 {
                     success = true;
                     message = "Registered Successfully";
-                    string messageSender = ("Registration successful" + "\n Email : " + Convert.ToString(user.Email) + "\n Password : " + (data.Password)) ;
+                    string messageSender = "Registration successful" + "\n Email : " + Convert.ToString(user.Email) + "\n Password : " + Convert.ToString(user.Password);
                     sender.Message(messageSender);
+                    sMTP.SendMail(Convert.ToString(data.Email), Convert.ToString(user.Password), messageSender);
+                   
                     return Ok(new { success, message, data });
                 }
             }
@@ -78,7 +84,7 @@ namespace EmployeeManagement.Controllers
                 {
                     success = true;
                     message = " Login Successfully";
-                    var jsonToken = GetToken(data, "login");
+                    var jsonToken = GenerateToken(data, "login");
                     return Ok(new { success, message, data, jsonToken });
                 }
         }
@@ -89,14 +95,13 @@ namespace EmployeeManagement.Controllers
         }
 
         //GET api/GetAllData
-        [Authorize]
+   //     [Authorize]
         [HttpGet]
         public ActionResult GetData()
         {
             try
             {
                 var register = userDetail.GetData();
-
                 return Ok(register);
             }
             catch (Exception e)
@@ -106,30 +111,28 @@ namespace EmployeeManagement.Controllers
         }
 
         //Generates Token for Login
-        public string GetToken(User data, string type)
+        private string GenerateToken(User responseData, string type)
         {
             try
             {
-                var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+                var symmetricSecuritykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
 
-                var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
+                var signingCreds = new SigningCredentials(symmetricSecuritykey, SecurityAlgorithms.HmacSha256);
 
                 var claims = new List<Claim>();
                 claims.Add(new Claim(ClaimTypes.Role, type));
-                claims.Add(new Claim("Id", data.Id.ToString()));
-                claims.Add(new Claim("Email", data.Email.ToString()));
-
+                claims.Add(new Claim("Id", responseData.Id.ToString()));
+                claims.Add(new Claim("Email", responseData.Email.ToString()));
                 var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                     _config["Jwt:Issuer"],
                     claims,
                     expires: DateTime.Now.AddMinutes(5),
-                    signingCredentials: signingCredentials
-                    );
+                    signingCredentials: signingCreds);
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                throw new Exception (e.Message);
+                throw new Exception(ex.Message);
             }
         }
     }

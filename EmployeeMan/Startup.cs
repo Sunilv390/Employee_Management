@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using NETCore.MailKit.Core;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Service;
 using System.Text;
@@ -34,6 +33,7 @@ namespace EmployeeManagement
             services.AddTransient<IEmployeeRepo, EmployeeRepo>();
             services.AddTransient<IUserDetail, UserDetail>();
             services.AddTransient<IUserService, RepoUserDetail>();
+
             services.AddCors(options => options.AddPolicy("MyPolicy", builder =>
             {
                 builder.AllowAnyOrigin()
@@ -73,6 +73,8 @@ namespace EmployeeManagement
                         ValidAudience = Configuration["JWT:Audience"]
                     };
                 });
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,13 +90,14 @@ namespace EmployeeManagement
             }
 
             //Enable middleware to serve generated Swagger as a JSON endpoint
+            app.UseAuthentication();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Managemnt");
                 options.RoutePrefix = "";
             });
-            app.UseAuthentication();
+           
             app.UseCors("MyPolicy");
             app.UseHttpsRedirection();
             app.UseMvc();

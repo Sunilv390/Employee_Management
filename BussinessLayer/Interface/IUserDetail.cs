@@ -8,7 +8,7 @@ namespace BussinessLayer.Interface
 {
     public interface IUserDetail
     {
-        Register AddUserDetail(Register user);
+        User AddUserDetail(Register user);
         List<Register> GetData();
         User Login(Login login);
     }
