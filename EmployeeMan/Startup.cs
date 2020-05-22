@@ -8,8 +8,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NETCore.MailKit.Core;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Service;
+using StackExchange.Redis;
+using StackExchange.Redis.Extensions.Core.Abstractions;
+using StackExchange.Redis.Extensions.Core.Configuration;
+using StackExchange.Redis.Extensions.Core.Implementations;
 using System.Text;
 
 namespace EmployeeManagement
@@ -33,6 +38,12 @@ namespace EmployeeManagement
             services.AddTransient<IEmployeeRepo, EmployeeRepo>();
             services.AddTransient<IUserDetail, UserDetail>();
             services.AddTransient<IUserService, RepoUserDetail>();
+             var redisConfiguration = Configuration.GetSection("Redis").Get<RedisConfiguration>();
+            services.AddSingleton(redisConfiguration);
+            services.AddSingleton<IRedisCacheClient, RedisCacheClient>();
+            services.AddSingleton<IRedisCacheConnectionPoolManager, RedisCacheConnectionPoolManager>();
+            services.AddSingleton<IRedisDefaultCacheClient, RedisDefaultCacheClient>();
+            services.AddSingleton<StackExchange.Redis.Extensions.Core.ISerializer, StackExchange.Redis.Extensions.MsgPack.MsgPackObjectSerializer>();
 
             services.AddCors(options => options.AddPolicy("MyPolicy", builder =>
             {
@@ -73,8 +84,6 @@ namespace EmployeeManagement
                         ValidAudience = Configuration["JWT:Audience"]
                     };
                 });
-
-           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

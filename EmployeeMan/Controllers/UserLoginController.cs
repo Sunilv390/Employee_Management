@@ -20,14 +20,16 @@ namespace EmployeeManagement.Controllers
     {
         private readonly IUserDetail userDetail;
         private readonly IConfiguration _config;
-        
+        //interface for redis cache
+        private readonly IRedisCacheClient _redis;
 
         MessageSender sender = new MessageSender();
         SMTPService sMTP = new SMTPService();
-        public UserLoginController(IUserDetail _userDetail,IConfiguration config)
+        public UserLoginController(IUserDetail _userDetail,IConfiguration config,IRedisCacheClient redis)
         {
             userDetail = _userDetail;
             _config = config;
+            _redis = redis;
         }
 
         //POST api/Register
@@ -39,6 +41,7 @@ namespace EmployeeManagement.Controllers
             try
             {
                 var data = userDetail.AddUserDetail(user);
+                var added = _redis.Db0.Add("data:key", data, DateTimeOffset.Now.AddMinutes(10));
                 bool success = false;
                 string message;
 
@@ -51,7 +54,9 @@ namespace EmployeeManagement.Controllers
                 {
                     success = true;
                     message = "Registered Successfully";
+
                     string messageSender = "Registration successful" + "\n Email : " + Convert.ToString(user.Email) + "\n Password : " + Convert.ToString(user.Password);
+
                     sender.Message(messageSender);
                     sMTP.SendMail(Convert.ToString(data.Email), Convert.ToString(user.Password), messageSender);
                    
@@ -102,7 +107,11 @@ namespace EmployeeManagement.Controllers
             try
             {
                 var register = userDetail.GetData();
-                return Ok(register);
+                var added = _redis.Db0.GetAll<Register>(new string[]
+                {
+                    "data:key"
+                });
+                return Ok(added.Values.ToList());
             }
             catch (Exception e)
             {
