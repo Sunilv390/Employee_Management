@@ -29,7 +29,7 @@ namespace EmployeeManagement.Service
             using (var client = new SmtpClient())
             {
                 client.Connect("smtp.gmail.com", 587, false);
-                client.Authenticate("sunilv390@gmail.com", "9082943232");
+                client.Authenticate("sunilv390@gmail.com", "password");
                 client.Send(message);
                 client.Disconnect(true);
             }
